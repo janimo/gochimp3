@@ -71,14 +71,18 @@ type ListResponse struct {
 	ListCreationRequest
 	withLinks
 
-	ID                string   `json:"id"`
-	DateCreated       string   `json:"date_created"`
-	ListRating        int      `json:"list_rating"`
-	SubscribeURLShort string   `json:"subscribe_url_short"`
-	SubscribeURLLong  string   `json:"subscribe_url_long"`
-	BeamerAddress     string   `json:"beamer_address"`
-	Modules           []string `json:"modules"`
-	Stats             Stats    `json:"stats"`
+	ID                   string   `json:"id"`
+	WebID                int      `json:"web_id"`
+	DateCreated          string   `json:"date_created"`
+	ListRating           int      `json:"list_rating"`
+	SubscribeURLShort    string   `json:"subscribe_url_short"`
+	SubscribeURLLong     string   `json:"subscribe_url_long"`
+	BeamerAddress        string   `json:"beamer_address"`
+	DoubleOptin          bool     `json:"double_optin"`
+	HasWelcome           bool     `json:"has_welcome"`
+	MarketingPermissions bool     `json:"marketing_permissions"`
+	Modules              []string `json:"modules"`
+	Stats                Stats    `json:"stats"`
 
 	api *API
 }
@@ -93,6 +97,7 @@ func (list *ListResponse) CanMakeRequest() error {
 
 type Stats struct {
 	MemberCount               int     `json:"member_count"`
+	TotalContacts             int     `json:"total_contacts"`
 	UnsubscribeCount          int     `json:"unsubscribe_count"`
 	CleanedCount              int     `json:"cleaned_count"`
 	MemberCountSinceSend      int     `json:"member_count_since_send"`
