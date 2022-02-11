@@ -26,9 +26,10 @@ var DatacenterRegex = regexp.MustCompile("[^-]\\w+$")
 
 // API represents the origin of the API
 type API struct {
-	Key       string
-	Timeout   time.Duration
-	Transport http.RoundTripper
+	Key         string
+	AccessToken string
+	Timeout     time.Duration
+	Transport   http.RoundTripper
 
 	User  string
 	Debug bool
@@ -48,6 +49,13 @@ func New(apiKey string) *API {
 		Key:      apiKey,
 		endpoint: u.String(),
 	}
+}
+
+// New creates an API that uses an OAuth2 access token
+func NewWithAccessToken(accessToken string, server string) *API {
+	api := New(fmt.Sprintf("%s-%s", accessToken, server))
+	api.AccessToken = accessToken
+	return api
 }
 
 // Request will make a call to the actual API.
@@ -82,7 +90,12 @@ func (api *API) Request(method, path string, params QueryParams, body, response 
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(api.User, api.Key)
+
+	if api.AccessToken != "" {
+		req.Header.Set("Authorization", "Bearer "+api.AccessToken)
+	} else {
+		req.SetBasicAuth(api.User, api.Key)
+	}
 
 	if params != nil && !reflect.ValueOf(params).IsNil() {
 		queryParams := req.URL.Query()
@@ -92,7 +105,7 @@ func (api *API) Request(method, path string, params QueryParams, body, response 
 			}
 		}
 		req.URL.RawQuery = queryParams.Encode()
-		
+
 		if api.Debug {
 			log.Printf("Adding query params: %q\n", req.URL.Query())
 		}
